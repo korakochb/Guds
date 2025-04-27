@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes wave-lift-arm {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    25% {
+        transform: translateY(-6px) rotate(8deg);
+    }
+
+    50% {
+        transform: translateY(-12px) rotate(-8deg);
+    }
+
+    75% {
+        transform: translateY(-6px) rotate(8deg);
+    }
+}
+
+@keyframes wave-lift-arm-flip {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg) scaleX(-1);
+    }
+
+    25% {
+        transform: translateY(-6px) rotate(8deg) scaleX(-1);
+    }
+
+    50% {
+        transform: translateY(-12px) rotate(-8deg) scaleX(-1);
+    }
+
+    75% {
+        transform: translateY(-6px) rotate(8deg) scaleX(-1);
+    }
+}

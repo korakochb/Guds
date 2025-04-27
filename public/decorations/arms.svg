@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="200" height="300" viewBox="0 0 200 300" xml:space="preserve">
+<desc>Created with Fabric.js 5.2.4</desc>
+<defs>
+</defs>
+<rect x="0" y="0" width="100%" height="100%" fill="transparent"></rect>
+<g transform="matrix(0 0 0 0 0 0)" id="5c64c3c3-7206-4d4f-92f3-2f8249a2578d"  >
+</g>
+<g transform="matrix(1 0 0 1 100 150)" id="04e50e90-7f6f-40eb-97c4-12b50e53e388"  >
+<rect style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1; visibility: hidden;" vector-effect="non-scaling-stroke"  x="-100" y="-150" rx="0" ry="0" width="200" height="300" />
+</g>
+<g transform="matrix(0.03 0 0 -0.03 100 150)"  >
+<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  transform=" translate(-5627, -12506.84)" d="M 5036 15669 C 4996 15658 4951 15612 4945 15576 C 4942 15559 4957 15327 4979 15061 C 5001 14794 5019 14575 5017 14574 C 5016 14573 4835 14700 4615 14856 C 4366 15033 4203 15142 4182 15146 C 4139 15154 4083 15132 4056 15097 C 4028 15059 4028 14991 4056 14953 C 4068 14938 4295 14771 4561 14582 L 5045 14239 L 5052 14157 C 5056 14112 5067 13996 5075 13900 C 5197 12542 5636 11201 6275 10235 C 6460 9955 6652 9719 6867 9509 C 7008 9370 7049 9340 7096 9340 C 7133 9340 7190 9376 7207 9410 C 7223 9442 7223 9499 7207 9526 C 7200 9537 7137 9603 7066 9671 C 6571 10148 6151 10836 5828 11700 C 5564 12406 5379 13252 5320 14025 C 5314 14102 5308 14182 5306 14203 C 5302 14241 5304 14244 5692 14663 C 5907 14895 6091 15099 6101 15115 C 6112 15132 6120 15164 6120 15188 C 6120 15274 6026 15333 5948 15296 C 5927 15286 5791 15147 5595 14934 C 5283 14597 5275 14589 5272 14622 C 5270 14640 5252 14862 5231 15115 C 5203 15458 5189 15583 5177 15606 C 5150 15659 5091 15685 5036 15669 z" stroke-linecap="round" />
+</g>
+</svg>
