@@ -5,7 +5,7 @@ import Home from './pages/Home';
 
 function App() {
   return (
-    <div className="font-sans">
+    <div className="font-tumb">
       <Navbar />
       <Home />
     </div>
