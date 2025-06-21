@@ -17,7 +17,7 @@ interface Props {
 
 const StackDisplay = forwardRef<HTMLDivElement, Props>(({ stack, parts, onRemoveAbove, onAddPart, isDarkMode }, ref) => {
   const baseGlowStyle = {
-    filter: isDarkMode ? 'drop-shadow(0 0 15px rgba(220, 220, 220, 0.5))' : 'none',
+    filter: isDarkMode ? 'drop-shadow(0 0 10px rgba(220, 220, 220, 0.5))' : 'none',
     transition: 'filter 0.3s ease-in-out',
   };
 
@@ -54,7 +54,7 @@ const StackDisplay = forwardRef<HTMLDivElement, Props>(({ stack, parts, onRemove
             const data = parts.find((p) => p.id === item.id);
 
             const dynamicGlowStyle = {
-              filter: isDarkMode && data?.glowColor ? `drop-shadow(0 0 15px ${data.glowColor})` : 'none',
+              filter: isDarkMode && data?.glowColor ? `drop-shadow(0 0 10px ${data.glowColor})` : 'none',
               transition: 'filter 0.3s ease-in-out',
             };
 
