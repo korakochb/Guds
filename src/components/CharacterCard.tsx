@@ -72,12 +72,12 @@ export default function CharacterCard({ part, stackRef, onAddPart, hoveredId, se
     clickSoundRef.current.volume = 0.5;
   }, []);
 
-  const playClickSound = () => {
-    if (clickSoundRef.current) {
-      clickSoundRef.current.currentTime = 0;
-      clickSoundRef.current.play();
-    }
-  };
+  // const playClickSound = () => {
+  //   if (clickSoundRef.current) {
+  //     clickSoundRef.current.currentTime = 0;
+  //     clickSoundRef.current.play();
+  //   }
+  // };
 
   return (
     <motion.div
@@ -124,7 +124,7 @@ export default function CharacterCard({ part, stackRef, onAddPart, hoveredId, se
       }}
       onClick={() => {
         if (clickEligible) {
-          playClickSound();
+          // playClickSound();
           onAddPart(part.id);
         }
       }}

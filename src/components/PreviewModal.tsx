@@ -7,9 +7,10 @@ interface Props {
   image: string | null;
   onClose: () => void;
   onDownload: () => void;
+  onShare: () => void;
 }
 
-export default function PreviewModal({ show, image, onClose, onDownload }: Props) {
+export default function PreviewModal({ show, image, onClose, onDownload, onShare }: Props) {
   if (!show || !image) return null;
 
   return (
@@ -23,7 +24,10 @@ export default function PreviewModal({ show, image, onClose, onDownload }: Props
             className="max-w-full h-auto object-contain"
           />
         </div>
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center flex-wrap gap-4">
+          <button onClick={onShare} className="bg-green-500 text-white px-4 py-2 rounded">
+            Share
+          </button>
           <button onClick={onDownload} className="bg-blue-600 text-white px-4 py-2 rounded">
             Download Image
           </button>

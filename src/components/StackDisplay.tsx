@@ -12,9 +12,15 @@ interface Props {
   parts: any[];
   onRemoveAbove: (index: number, id: string) => void;
   onAddPart: (partId: string) => void;
+  isDarkMode: boolean;
 }
 
-const StackDisplay = forwardRef<HTMLDivElement, Props>(({ stack, parts, onRemoveAbove, onAddPart }, ref) => {
+const StackDisplay = forwardRef<HTMLDivElement, Props>(({ stack, parts, onRemoveAbove, onAddPart, isDarkMode }, ref) => {
+  const baseGlowStyle = {
+    filter: isDarkMode ? 'drop-shadow(0 0 15px rgba(220, 220, 220, 0.5))' : 'none',
+    transition: 'filter 0.3s ease-in-out',
+  };
+
   return (
     <div
       ref={ref}
@@ -25,13 +31,18 @@ const StackDisplay = forwardRef<HTMLDivElement, Props>(({ stack, parts, onRemove
           onAddPart(partId);
         }
       }}
-      className="flex flex-col items-center justify-end h-screen max-h-screen overflow-y-auto bg-white border border-black rounded p-4 relative"
+      className="flex flex-col items-center justify-end h-full w-full overflow-y-auto relative transition-colors duration-300"
+      style={{
+        background: isDarkMode ? "#444444" : "#f7f7f7",
+        border: "none",
+      }}
     >
       <div id="stack-capture" className="inline-flex flex-col items-center justify-end">
         <img
           src="/decorations/base.png"
           alt="base"
           className="absolute bottom-0 w-56 h-auto pointer-events-none z-0"
+          style={baseGlowStyle}
         />
 
         {stack
@@ -42,6 +53,11 @@ const StackDisplay = forwardRef<HTMLDivElement, Props>(({ stack, parts, onRemove
             const offset = 71.5 + index * 120;
             const data = parts.find((p) => p.id === item.id);
 
+            const dynamicGlowStyle = {
+              filter: isDarkMode && data?.glowColor ? `drop-shadow(0 0 15px ${data.glowColor})` : 'none',
+              transition: 'filter 0.3s ease-in-out',
+            };
+
             return (
               <img
                 key={item.uid}
@@ -51,6 +67,7 @@ const StackDisplay = forwardRef<HTMLDivElement, Props>(({ stack, parts, onRemove
                 style={{
                   position: "absolute",
                   bottom: `${offset}px`,
+                  ...dynamicGlowStyle,
                 }}
                 onClick={() => onRemoveAbove(reversedIndex, item.id)}
               />
