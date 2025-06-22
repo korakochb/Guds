@@ -125,7 +125,7 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
       <section className="flex items-center justify-center px-8 pt-8 pb-8 md:min-h-screen md:p-8">
         <div className="w-full max-w-screen-xl">
           <img
-            src="/decorations/GudsPreviewLight.jpg"
+            src={isDarkMode ? "/decorations/GudsPreviewDark.png" : "/decorations/GudsPreviewLight.jpg"}
             alt="Guds Preview"
             className="w-full h-auto rounded-lg"
           />
