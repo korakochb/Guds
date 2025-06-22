@@ -1,0 +1,26 @@
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.infinite-strip-container {
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.infinite-strip-scroller {
+  display: flex;
+  width: max-content;
+  animation: scroll 80s linear infinite;
+}
+
+.infinite-strip-container:hover .infinite-strip-scroller {
+  animation-play-state: paused;
+} 

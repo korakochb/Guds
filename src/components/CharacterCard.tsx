@@ -2,25 +2,29 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useDragControls } from "framer-motion";
-import { getArmPosition } from "../utils/getArmPosition";
-import { useGlobalMousePosition } from "../hooks/useGlobalMousePosition";
+import { getArmPosition } from "../lib/getArmPosition";
+import { useGlobalMousePosition } from "../lib/useGlobalMousePosition";
 
 interface Props {
   part: {
     id: string;
     name: string;
-    img: string;
+    basePath: string;
+    colors: string[];
     hasFace: boolean;
     hasArms: boolean;
     hasMouth: boolean;
   };
   stackRef: React.RefObject<HTMLDivElement | null>;
-  onAddPart: (partId: string) => void;
+  onAddPart: (partId: string, imgSrc: string) => void;
   hoveredId: string | null;
   setHoveredId: (id: string | null) => void;
 }
 
-export default function CharacterCard({ part, stackRef, onAddPart, hoveredId, setHoveredId }: Props) {
+const CharacterCard: React.FC<Props> = ({ part, stackRef, onAddPart, hoveredId, setHoveredId }) => {
+  const [selectedColor, setSelectedColor] = useState(
+    () => part.colors[Math.floor(Math.random() * part.colors.length)]
+  );
   const [isHover, setIsHover] = useState(false);
   const [isBlinking, setIsBlinking] = useState(false);
   const [dragBack, setDragBack] = useState(false);
@@ -37,8 +41,6 @@ export default function CharacterCard({ part, stackRef, onAddPart, hoveredId, se
   const dragControls = useDragControls();
 
   const isActive = hoveredId === null || hoveredId === part.id;
-
-  const clickSoundRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const rect = cardRef.current?.getBoundingClientRect();
@@ -66,18 +68,6 @@ export default function CharacterCard({ part, stackRef, onAddPart, hoveredId, se
     blink();
     return () => clearTimeout(timeout);
   }, []);
-
-  useEffect(() => {
-    clickSoundRef.current = new Audio("/sounds/switch.mp3");
-    clickSoundRef.current.volume = 0.5;
-  }, []);
-
-  // const playClickSound = () => {
-  //   if (clickSoundRef.current) {
-  //     clickSoundRef.current.currentTime = 0;
-  //     clickSoundRef.current.play();
-  //   }
-  // };
 
   return (
     <motion.div
@@ -115,23 +105,24 @@ export default function CharacterCard({ part, stackRef, onAddPart, hoveredId, se
           e.clientY <= rect.bottom;
 
         if (inArea) {
-          onAddPart(part.id);
+          onAddPart(part.id, `${part.basePath}${selectedColor}.png`);
         }
 
         setDragBack(true);
         setClickEligible(false);
         if (dragTimeout.current) clearTimeout(dragTimeout.current);
       }}
-      onClick={() => {
-        if (clickEligible) {
-          // playClickSound();
-          onAddPart(part.id);
-        }
-      }}
       className="flex flex-col items-center cursor-grab relative z-10"
     >
-      <div className="relative w-24 h-24">
-        <img src={part.img} alt={part.name} className="w-full h-full object-contain pointer-events-none" />
+      <div 
+        className="relative w-28 h-28"
+        onClick={() => {
+          if (clickEligible) {
+            onAddPart(part.id, `${part.basePath}${selectedColor}.png`);
+          }
+        }}
+      >
+        <img src={`${part.basePath}${selectedColor}.png`} alt={part.name} className="w-full h-full object-contain pointer-events-none" />
 
         {part.hasFace && (
           <div className="absolute top-[22px] left-1/2 -translate-x-1/2 w-[52px] h-[28px] flex justify-between items-center pointer-events-none">
@@ -194,7 +185,29 @@ export default function CharacterCard({ part, stackRef, onAddPart, hoveredId, se
           </>
         )}
       </div>
-      <p className="mt-3 text-base font-bold tracking-wider">{part.name}</p>
+      <p 
+        className="mt-2 text-sm font-avenir-reg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {part.name}
+      </p>
+      <div className="flex space-x-2 mt-2">
+        {part.colors.map((color) => (
+          <div
+            key={color}
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedColor(color);
+            }}
+            className={`w-4 h-4 rounded-full cursor-pointer transition-transform duration-200 ${
+              selectedColor === color ? "scale-125" : "hover:scale-110"
+            }`}
+            style={{ backgroundColor: `#${color}` }}
+          />
+        ))}
+      </div>
     </motion.div>
   );
-}
+};
+
+export default CharacterCard;

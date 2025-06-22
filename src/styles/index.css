@@ -1,0 +1,75 @@
+@font-face {
+    font-family: 'Tumb';
+    src: url('/font/Tumb-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Mont';
+    src: url('/font/Mont-ExtraLightDEMO.otf') format('opentype');
+    font-weight: 300; /* ExtraLight is often 300 */
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Avenir Next Reg';
+    src: url('/font/Avenir-next-regular.ttf') format('truetype');
+    font-weight: normal; /* 400 */
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Avenir Next Demi';
+    src: url('/font/Avenir-next-demi-bold.ttf') format('truetype');
+    font-weight: 600; /* Demi Bold is often 600 */
+    font-style: normal;
+}
+
+body {
+    font-family: 'Tumb', sans-serif;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes wave-lift-arm {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    25% {
+        transform: translateY(-6px) rotate(8deg);
+    }
+
+    50% {
+        transform: translateY(-12px) rotate(-8deg);
+    }
+
+    75% {
+        transform: translateY(-6px) rotate(8deg);
+    }
+}
+
+@keyframes wave-lift-arm-flip {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg) scaleX(-1);
+    }
+
+    25% {
+        transform: translateY(-6px) rotate(8deg) scaleX(-1);
+    }
+
+    50% {
+        transform: translateY(-12px) rotate(-8deg) scaleX(-1);
+    }
+
+    75% {
+        transform: translateY(-6px) rotate(8deg) scaleX(-1);
+    }
+}
