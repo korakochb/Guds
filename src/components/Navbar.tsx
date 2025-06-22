@@ -51,7 +51,7 @@ export default function Navbar({ isDarkMode }) {
           <a href="#" className={linkStyle}>home</a>
           <a href="#" className={linkStyle}>menu</a>
           <div className={`text-3xl font-bold tracking-wide ${textColorClass}`}>
-            <a href="/">GÜDS</a>
+            <a href="/">güds</a>
           </div>
           <a href="#" className={linkStyle}>about us</a>
           <a href="#" className={linkStyle}>cart</a>
