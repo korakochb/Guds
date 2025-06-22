@@ -20,7 +20,7 @@ export default function Navbar({ isDarkMode }) {
             
             {/* Center Logo */}
             <div className={`flex-1 text-center text-3xl font-bold tracking-wide ${textColorClass}`}>
-              <a href="/">GÜDS</a>
+              <a href="/">güds</a>
             </div>
 
             {/* Right button */}
