@@ -7,9 +7,11 @@ interface Props {
   image: string | null;
   onClose: () => void;
   onShare: () => void;
+  userName: string;
+  setUserName: (name: string) => void;
 }
 
-export default function PreviewModal({ show, image, onClose, onShare }: Props) {
+export default function PreviewModal({ show, image, onClose, onShare, userName, setUserName }: Props) {
   if (!show || !image) return null;
 
   // Check for Web Share API support
@@ -20,6 +22,14 @@ export default function PreviewModal({ show, image, onClose, onShare }: Props) {
       <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-6">
         <div className="bg-white p-6 rounded shadow-lg text-center w-[90%] max-w-md">
           <h3 className="text-xl font-avenir-demi font-semibold mb-4">YOUR GÚD</h3>
+          <input
+            type="text"
+            placeholder="Enter your name..."
+            value={userName}
+            onChange={e => setUserName(e.target.value)}
+            className="w-full mb-4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-lg text-center font-avenir-reg"
+            maxLength={10}
+          />
           <div className="w-full flex items-center justify-center mx-auto mb-4 border bg-white">
             <img
               src={image}

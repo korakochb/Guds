@@ -1,7 +1,8 @@
 // src/components/StackDisplay.tsx
 
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
 import { parts } from '../config/parts';
+import LightHintOverlay from "./LightHintOverlay";
 
 export type StackItem = {
   id: string;
@@ -15,15 +16,21 @@ interface Props {
   isDarkMode: boolean;
   setIsDarkMode: (isDark: boolean) => void;
   onPreview: () => void;
+  userName?: string;
+  showNameWording?: boolean;
 }
 
 const StackDisplay = forwardRef<HTMLDivElement, Props>(
-  ({ stack, onRemoveAbove, isDarkMode, setIsDarkMode, onPreview }, ref) => {
+  ({ stack, onRemoveAbove, isDarkMode, setIsDarkMode, onPreview, userName, showNameWording }, ref) => {
     const baseGlowStyle = {
       filter: isDarkMode ? 'drop-shadow(0 0 10px rgba(220, 220, 220, 0.5))' : 'none',
       transition: 'filter 0.3s ease-in-out',
       verticalAlign: 'bottom'
     };
+
+    // Overlay state: always show on every page load
+    const [showHint, setShowHint] = useState(true);
+    const handleCloseHint = () => setShowHint(false);
 
     return (
       <div
@@ -32,10 +39,14 @@ const StackDisplay = forwardRef<HTMLDivElement, Props>(
           background: "transparent",
         }}
       >
+        {showHint && <LightHintOverlay onClose={handleCloseHint} />}
         <div className="fixed left-4 bottom-4 z-50 flex flex-col items-start">
           {/* <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50 flex flex-col items-start"> */}
           <button
-            onClick={() => setIsDarkMode(false)}
+            onClick={() => {
+              setIsDarkMode(false);
+              handleCloseHint();
+            }}
             className={`w-12 flex items-center justify-center font-avenir-reg text-lg text-white ${!isDarkMode ? 'h-8 bg-[#333]' : 'h-14 bg-[#666]'} rounded-t transition-all duration-300`}
             style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
             aria-label="Light mode"
@@ -43,7 +54,10 @@ const StackDisplay = forwardRef<HTMLDivElement, Props>(
             i
           </button>
           <button
-            onClick={() => setIsDarkMode(true)}
+            onClick={() => {
+              setIsDarkMode(true);
+              handleCloseHint();
+            }}
             className={`w-12 flex items-center justify-center font-avenir-reg text-lg text-white ${isDarkMode ? 'h-8 bg-[#333]' : 'h-14 bg-[#666]'} rounded-b transition-all duration-300`}
             style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
             aria-label="Dark mode"
@@ -60,11 +74,29 @@ const StackDisplay = forwardRef<HTMLDivElement, Props>(
             // but we'll leave the drop target for now.
             e.preventDefault();
           }}
-          className="flex-grow flex flex-col items-center justify-end w-full pb-8"
+          className="flex-grow flex flex-col items-center justify-end w-full pb-8 relative"
         >
+          {showNameWording && (
+            <div className="absolute top-0 left-0 w-full flex flex-col items-start justify-center pointer-events-none select-none z-0">
+              {userName ? (
+                <>
+                  <span className={`mt-4 text-[2rem] md:text-[3rem] font-avenir-reg opacity-70 text-center w-full ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                    {userName}
+                  </span>
+                  <span className={`text-base md:text-lg font-avenir-reg opacity-70 text-center w-full ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                    is ready to be your GÚD friend!
+                  </span>
+                </>
+              ) : (
+                <span className={`mt-4 text-[2rem] md:text-[3rem] font-avenir-reg opacity-70 text-center w-full ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                  Enter your name...
+                </span>
+              )}
+            </div>
+          )}
           <div
             id="stack-capture"
-            className="inline-flex flex-col-reverse items-center pt-8"
+            className="inline-flex flex-col-reverse items-center pt-24 md:pt-16 z-10"
             style={{ lineHeight: 1 }}
           >
             {[...stack].reverse().map((item, index) => {

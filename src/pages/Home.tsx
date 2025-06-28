@@ -18,7 +18,10 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
   const [stack, setStack] = useState([{ id: "base", uid: "base", img: "/decorations/base.png" }]);
   const [capturedImg, setCapturedImg] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showModalOverlay, setShowModalOverlay] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [userName, setUserName] = useState("");
+  const [showNameWording, setShowNameWording] = useState(false);
 
   useEffect(() => {
     if (showModal) {
@@ -43,14 +46,14 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
   };
 
   const handlePreview = async () => {
+    setShowNameWording(true);
+    setShowModalOverlay(true);
     const elementToCapture = stackRef.current;
     if (!elementToCapture) {
       console.error("Preview target element not found.");
+      setShowModalOverlay(false);
       return;
     }
-
-    // Use a more aggressive, global stylesheet to remove any potential outlines or borders
-    // during capture. This is the most forceful way to address the white-border issue.
     const style = document.createElement('style');
     style.innerHTML = `
       * {
@@ -60,8 +63,11 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
     `;
     document.head.appendChild(style);
 
-    // Add a small delay to ensure the browser applies the new global style
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise(resolve => {
+      requestAnimationFrame(() => {
+        setTimeout(resolve, 500);
+      });
+    });
 
     try {
       const bgColor = isDarkMode ? '#444444' : '#f7f7f7';
@@ -78,7 +84,7 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
       }
 
       setCapturedImg(dataUrl);
-      setShowModal(true);
+      if (!showModal) setShowModal(true);
     } catch (error) {
       console.error('Error capturing preview with dom-to-image:', error);
       alert(`An error occurred while creating the preview. Please check the console for details.`);
@@ -86,6 +92,13 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
       document.head.removeChild(style);
     }
   };
+
+  useEffect(() => {
+    if (showModal) {
+      handlePreview();
+    }
+    // eslint-disable-next-line
+  }, [userName]);
 
   const handleShare = async () => {
     if (!capturedImg) return;
@@ -148,6 +161,8 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
               isDarkMode={isDarkMode}
               setIsDarkMode={setIsDarkMode}
               onPreview={handlePreview}
+              userName={userName}
+              showNameWording={showNameWording}
             />
           </div>
 
@@ -190,11 +205,23 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
         </div>
       </section>
 
+      {showModalOverlay && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-2xl">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white border-opacity-80"></div>
+        </div>
+      )}
       <PreviewModal
         show={showModal}
         image={capturedImg}
-        onClose={() => setShowModal(false)}
+        onClose={() => {
+          setShowModal(false);
+          setShowModalOverlay(false);
+          setShowNameWording(false);
+          setUserName("");
+        }}
         onShare={handleShare}
+        userName={userName}
+        setUserName={setUserName}
       />
     </div>
   );
