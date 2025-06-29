@@ -3,6 +3,7 @@ export const parts = [
     {
         id: "luna", name: "LUNA", basePath: "/characters/Luna/Luna_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 86.35, height: 80,
         hasFace: true,
         hasArms: true,
         hasMouth: true,
@@ -10,6 +11,7 @@ export const parts = [
     {
         id: "spike", name: "SPIKE", basePath: "/characters/Spike/Spike_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 121.84, height: 120,
         hasFace: true,
         hasArms: true,
         hasMouth: true,
@@ -17,6 +19,7 @@ export const parts = [
     {
         id: "nox", name: "NOX", basePath: "/characters/Nox/Nox_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 117.12, height: 80,
         hasFace: true,
         hasArms: true,
         hasMouth: true,
@@ -24,6 +27,7 @@ export const parts = [
     {
         id: "dime", name: "DIME", basePath: "/characters/Dime/Dime_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 178.29, height: 80,
         hasFace: true,
         hasArms: true,
         hasMouth: true,
@@ -31,6 +35,7 @@ export const parts = [
     {
         id: "bogg", name: "BOGG", basePath: "/characters/Bogg/Bogg_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 120, height: 120,
         hasFace: true,
         hasArms: true,
         hasMouth: true,
@@ -38,6 +43,7 @@ export const parts = [
     {
         id: "slinky", name: "SLINKY", basePath: "/characters/Slinky/Slinky_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 93.54, height: 80,
         hasFace: true,
         hasArms: true,
         hasMouth: true,
@@ -45,6 +51,7 @@ export const parts = [
     {
         id: "sunny", name: "SUNNY", basePath: "/characters/Sunny/Sunny_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 129.52, height: 120,
         hasFace: true,
         hasArms: true,
         hasMouth: true,
@@ -52,6 +59,7 @@ export const parts = [
     {
         id: "muff", name: "MUFF", basePath: "/characters/Muff/Muff_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 93.01, height: 80,
         hasFace: true,
         hasArms: true,
         hasMouth: true,
@@ -59,6 +67,7 @@ export const parts = [
     {
         id: "bruno", name: "BRUNO", basePath: "/characters/Bruno/Bruno_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 279.22, height: 80,
         hasFace: true,
         hasArms: true,
         hasMouth: true,
@@ -66,6 +75,7 @@ export const parts = [
     {
         id: "bob", name: "BOB", basePath: "/characters/Bob/Bob_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 154.96, height: 80,
         hasFace: true,
         hasArms: true,
         hasMouth: true,
@@ -73,6 +83,7 @@ export const parts = [
     {
         id: "willy", name: "WILLY", basePath: "/characters/Willy/Willy_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 118.26, height: 120,
         hasFace: true,
         hasArms: true,
         hasMouth: true,
@@ -80,6 +91,7 @@ export const parts = [
     {
         id: "pooh", name: "POOH", basePath: "/characters/Pooh/Pooh_",
         colors: ["353432", "9fd6ff", "aa9e92", "fee98e", "ff953f"],
+        width: 175.69, height: 80,
         hasFace: true,
         hasArms: true,
         hasMouth: true,

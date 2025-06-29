@@ -8,6 +8,7 @@ import { MAX_STACK_ITEMS } from "../config/layout";
 import PreviewModal from "../components/PreviewModal";
 import InfinitePartStrip from "../components/InfinitePartStrip";
 import PreviewStackDisplay from "../components/PreviewStackDisplay";
+import { generateStackImageWithCanvas } from '../lib/canvasStack';
 
 interface HomeProps {
   isDarkMode: boolean;
@@ -131,31 +132,23 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
     }
   };
 
-  // กด Confirm เพื่อ generate รูป
-  const handleConfirm = async () => {
+  const handleConfirmCanvas = async () => {
     setShowModalOverlay(true);
-    let lastDataUrl = null;
-    for (let i = 0; i < 5; i++) {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // รอ 1 วิแต่ละรอบ
-      try {
-        const elementToCapture = document.getElementById('preview-capture');
-        if (!elementToCapture) throw new Error('Preview element not found');
-        const style = document.createElement('style');
-        style.innerHTML = `* { outline: none !important; border: none !important; }`;
-        document.head.appendChild(style);
-        lastDataUrl = await domtoimage.toJpeg(elementToCapture, {
-          quality: 1.0,
-          width: previewSize.width,
-          height: previewSize.height,
-          bgcolor: isDarkMode ? '#444444' : '#f7f7f7',
-        });
-        document.head.removeChild(style);
-      } catch (error) {
-        console.error("Error generating image (round", i + 1, "):", error);
-      }
+    try {
+      const dataUrl = await generateStackImageWithCanvas({
+        stack,
+        userName,
+        isDarkMode,
+        width: previewSize.width,
+        height: previewSize.height,
+        parts,
+      });
+      setGeneratedImg(dataUrl);
+    } catch (error) {
+      console.error("Canvas error:", error);
+    } finally {
+      setShowModalOverlay(false);
     }
-    setGeneratedImg(lastDataUrl);
-    setShowModalOverlay(false);
   };
 
   // กด Share เพื่อ share รูปที่ generate ไว้แล้ว
@@ -185,31 +178,6 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
     link.href = generatedImg;
     link.download = 'my-gud-stack.jpg';
     link.click();
-  };
-
-  const handleRefresh = async () => {
-    setShowModalOverlay(true);
-    await new Promise(resolve => setTimeout(resolve, 0)); // ให้ React render overlay ก่อน
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    try {
-      const elementToCapture = document.getElementById('preview-capture');
-      if (!elementToCapture) throw new Error('Preview element not found');
-      const style = document.createElement('style');
-      style.innerHTML = `* { outline: none !important; border: none !important; }`;
-      document.head.appendChild(style);
-      const dataUrl = await domtoimage.toJpeg(elementToCapture, {
-        quality: 1.0,
-        width: previewSize.width,
-        height: previewSize.height,
-        bgcolor: isDarkMode ? '#444444' : '#f7f7f7',
-      });
-      setGeneratedImg(dataUrl);
-      document.head.removeChild(style);
-    } catch (error) {
-      alert(`An error occurred while generating image: ${error.message}`);
-    } finally {
-      setShowModalOverlay(false);
-    }
   };
 
   const handleBackToPreview = () => {
@@ -368,13 +336,15 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
           )
         }
         confirmButton={!generatedImg && (
-          <button
-            className="w-full bg-blue-500 text-white font-avenir-reg text-lg px-8 py-3 rounded-full hover:bg-blue-600 transition-colors mb-3"
-            onClick={handleConfirm}
-            disabled={!assetsLoaded || !previewReady}
-          >
-            Confirm
-          </button>
+          <>
+            <button
+              className="w-full bg-blue-500 text-white font-avenir-reg text-lg px-8 py-3 rounded-full hover:bg-blue-600 transition-colors mb-3"
+              onClick={handleConfirmCanvas}
+              disabled={!assetsLoaded || !previewReady}
+            >
+              Confirm (Canvas)
+            </button>
+          </>
         )}
         backButton={generatedImg && (
           <button
@@ -386,7 +356,6 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
         )}
         shareDisabled={!generatedImg}
         showOverlay={showModalOverlay}
-        onRefresh={handleRefresh}
       />
     </div>
   );
