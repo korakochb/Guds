@@ -40,6 +40,8 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
   const [showNameWording, setShowNameWording] = useState(false);
   const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [previewReady, setPreviewReady] = useState(false);
+  const [generatedImg, setGeneratedImg] = useState<string | null>(null);
+  const [isShareConfirming, setIsShareConfirming] = useState(false);
 
   // Responsive preview size (16:9 desktop, 9:16 mobile)
   const [previewSize, setPreviewSize] = useState({ width: 1920, height: 1080 });
@@ -97,6 +99,17 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
     }
   }, [showModal]);
 
+  useEffect(() => {
+    if (showModalOverlay) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showModalOverlay]);
+
   const handleAddPart = (partId: string, imgSrc: string) => {
     if (stack.length >= MAX_STACK_ITEMS) return;
     const uid = `${partId}-${Date.now()}`;
@@ -118,53 +131,88 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
     }
   };
 
-  // Share: capture จาก div preview จริง
-  const handleShare = async () => {
+  // กด Confirm เพื่อ generate รูป
+  const handleConfirm = async () => {
     setShowModalOverlay(true);
+    // รอ 2 วินาทีให้มือถือโหลด asset/render ครบ
+    await new Promise(resolve => setTimeout(resolve, 2000));
     try {
       const elementToCapture = document.getElementById('preview-capture');
       if (!elementToCapture) throw new Error('Preview element not found');
       const style = document.createElement('style');
       style.innerHTML = `* { outline: none !important; border: none !important; }`;
       document.head.appendChild(style);
-      await new Promise(resolve => setTimeout(resolve, 10)); // รอ 10 วินาทีให้ทุกอย่างโหลดเสร็จ
       const dataUrl = await domtoimage.toJpeg(elementToCapture, {
         quality: 1.0,
         width: previewSize.width,
         height: previewSize.height,
         bgcolor: isDarkMode ? '#444444' : '#f7f7f7',
       });
-      setCapturedImg(dataUrl);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      setGeneratedImg(dataUrl);
+      document.head.removeChild(style);
+    } catch (error) {
+      alert(`An error occurred while generating image: ${error.message}`);
+    } finally {
+      setShowModalOverlay(false);
+    }
+  };
+
+  // กด Share เพื่อ share รูปที่ generate ไว้แล้ว
+  const handleShareGenerated = async () => {
+    if (!generatedImg) return;
+    setShowModalOverlay(true);
+    try {
       if (navigator.share) {
-        const response = await fetch(dataUrl);
+        const response = await fetch(generatedImg);
         const blob = await response.blob();
         const file = new File([blob], 'my-gud-stack.jpg', { type: blob.type });
-        try {
-          await navigator.share({ files: [file], title: 'My GÚD Stack', text: 'Check out the GÚD friend I created!' });
-        } catch (err) {
-          await new Promise(resolve => setTimeout(resolve, 500));
-          try {
-            await navigator.share({ files: [file], title: 'My GÚD Stack', text: 'Check out the GÚD friend I created!' });
-          } catch (err2) {
-            alert('An error occurred while sharing. Please try again.');
-          }
-        }
+        await navigator.share({ files: [file], title: 'My GÚD Stack', text: 'Check out the GÚD friend I created!' });
       } else {
         alert('Sharing is not supported on this browser.');
       }
-      document.head.removeChild(style);
     } catch (error) {
-      if (error.name !== 'AbortError') {
-        alert(`An error occurred while sharing: ${error.message}`);
-      }
-      document.body.style.overflow = 'auto';
-      document.documentElement.style.overflow = 'auto';
+      alert(`An error occurred while sharing: ${error.message}`);
     } finally {
       setShowModalOverlay(false);
-      document.body.style.overflow = 'auto';
-      document.documentElement.style.overflow = 'auto';
     }
+  };
+
+  // ปุ่ม Save Image
+  const handleSaveImage = () => {
+    if (!generatedImg) return;
+    const link = document.createElement('a');
+    link.href = generatedImg;
+    link.download = 'my-gud-stack.jpg';
+    link.click();
+  };
+
+  const handleRefresh = async () => {
+    setShowModalOverlay(true);
+    await new Promise(resolve => setTimeout(resolve, 0)); // ให้ React render overlay ก่อน
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      const elementToCapture = document.getElementById('preview-capture');
+      if (!elementToCapture) throw new Error('Preview element not found');
+      const style = document.createElement('style');
+      style.innerHTML = `* { outline: none !important; border: none !important; }`;
+      document.head.appendChild(style);
+      const dataUrl = await domtoimage.toJpeg(elementToCapture, {
+        quality: 1.0,
+        width: previewSize.width,
+        height: previewSize.height,
+        bgcolor: isDarkMode ? '#444444' : '#f7f7f7',
+      });
+      setGeneratedImg(dataUrl);
+      document.head.removeChild(style);
+    } catch (error) {
+      alert(`An error occurred while generating image: ${error.message}`);
+    } finally {
+      setShowModalOverlay(false);
+    }
+  };
+
+  const handleBackToPreview = () => {
+    setGeneratedImg(null); // กลับไปหน้า preview เดิม
   };
 
   useEffect(() => {
@@ -246,12 +294,6 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
         </div>
       </section>
 
-      {showModalOverlay && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-2xl">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white border-opacity-80"></div>
-        </div>
-      )}
-
       {/* Offscreen preview for capture (not scaled, real size) */}
       {showModal && (
         <div style={{ position: 'absolute', left: '-99999px', top: 0, width: previewSize.width, height: previewSize.height }}>
@@ -269,55 +311,89 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
 
       <PreviewModal
         show={showModal}
-        image={capturedImg}
+        image={generatedImg}
         onClose={() => {
           setShowModal(false);
           setShowModalOverlay(false);
           setShowNameWording(false);
           setUserName("");
+          setIsShareConfirming(false);
+          setGeneratedImg(null);
         }}
-        onShare={handleShare}
+        onShare={handleShareGenerated}
         userName={userName}
         setUserName={setUserName}
         previewContent={
-          <div
-            style={{
-              width: '100%',
-              height: '70vh',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: '#f7f7f7',
-              borderRadius: 8,
-              overflow: 'hidden',
-            }}
-          >
+          !generatedImg ? (
             <div
               style={{
-                width: previewSize.width,
-                height: previewSize.height,
-                transform: `scale(${Math.min(
-                  (window.innerWidth * 0.9) / previewSize.width,
-                  (window.innerHeight * 0.7) / previewSize.height,
-                  1
-                )})`,
-                transformOrigin: 'center center',
+                width: '100%',
+                height: '70vh',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                background: '#f7f7f7',
+                borderRadius: 8,
+                overflow: 'hidden',
               }}
             >
-              <PreviewStackDisplay
-                stack={stack}
-                userName={userName}
-                isDarkMode={isDarkMode}
-                width={previewSize.width}
-                height={previewSize.height}
-              />
+              <div
+                style={{
+                  width: previewSize.width,
+                  height: previewSize.height,
+                  transform: `scale(${Math.min(
+                    (window.innerWidth * 0.9) / previewSize.width,
+                    (window.innerHeight * 0.7) / previewSize.height,
+                    1
+                  )})`,
+                  transformOrigin: 'center center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                id="preview-capture"
+              >
+                <PreviewStackDisplay
+                  stack={stack}
+                  userName={userName}
+                  isDarkMode={isDarkMode}
+                  width={previewSize.width}
+                  height={previewSize.height}
+                />
+              </div>
             </div>
-          </div>
+          ) : (
+            <img src={generatedImg} alt="Preview" className="max-w-full h-auto rounded" />
+          )
         }
-        shareDisabled={!assetsLoaded || !previewReady}
+        confirmButton={!generatedImg && (
+          <button
+            className="w-full bg-blue-500 text-white font-avenir-reg text-lg px-8 py-3 rounded-full hover:bg-blue-600 transition-colors mb-3"
+            onClick={handleConfirm}
+            disabled={!assetsLoaded || !previewReady}
+          >
+            Confirm
+          </button>
+        )}
+        saveButton={generatedImg && (
+          <button
+            className="w-full bg-green-500 text-white font-avenir-reg text-lg px-8 py-3 rounded-full hover:bg-green-600 transition-colors mb-3"
+            onClick={handleSaveImage}
+          >
+            Save Image
+          </button>
+        )}
+        backButton={generatedImg && (
+          <button
+            className="w-full bg-gray-300 text-black font-avenir-reg text-lg px-8 py-3 rounded-full hover:bg-gray-400 transition-colors mb-3"
+            onClick={handleBackToPreview}
+          >
+            Back
+          </button>
+        )}
+        shareDisabled={!generatedImg}
+        showOverlay={showModalOverlay}
+        onRefresh={handleRefresh}
       />
     </div>
   );
