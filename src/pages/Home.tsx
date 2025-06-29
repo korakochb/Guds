@@ -7,6 +7,7 @@ import CharacterCard from "../components/CharacterCard";
 import { MAX_STACK_ITEMS } from "../config/layout";
 import PreviewModal from "../components/PreviewModal";
 import InfinitePartStrip from "../components/InfinitePartStrip";
+import PreviewStackDisplay from "../components/PreviewStackDisplay";
 
 interface HomeProps {
   isDarkMode: boolean;
@@ -23,19 +24,37 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
   const [userName, setUserName] = useState("");
   const [showNameWording, setShowNameWording] = useState(false);
 
+  // Responsive preview size (16:9 desktop, 9:16 mobile)
+  const [previewSize, setPreviewSize] = useState({ width: 1920, height: 1080 });
+  useEffect(() => {
+    const updateSize = () => {
+      if (window.innerWidth < 768) {
+        setPreviewSize({ width: 1080, height: 1920 }); // mobile 9:16
+      } else {
+        setPreviewSize({ width: 1920, height: 1080 }); // desktop 16:9
+      }
+    };
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
   useEffect(() => {
     if (showModal) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
     }
     return () => {
       document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
     };
   }, [showModal]);
 
   const handleAddPart = (partId: string, imgSrc: string) => {
-    if (stack.length >= MAX_STACK_ITEMS) return; // ✅ จำกัดสูงสุด 7 ชิ้นรวมฐาน
+    if (stack.length >= MAX_STACK_ITEMS) return;
     const uid = `${partId}-${Date.now()}`;
     setStack((prev) => [{ id: partId, uid, img: imgSrc }, ...prev]);
   };
@@ -45,92 +64,60 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
     setStack((prev) => prev.slice(index + 1));
   };
 
-  const handlePreview = async () => {
+  // เปิด modal preview
+  const handlePreview = () => {
     setShowNameWording(true);
+    setShowModal(true);
+  };
+
+  // Share: capture จาก div preview จริง
+  const handleShare = async () => {
     setShowModalOverlay(true);
-    const elementToCapture = stackRef.current;
-    if (!elementToCapture) {
-      console.error("Preview target element not found.");
-      setShowModalOverlay(false);
-      return;
-    }
-    const style = document.createElement('style');
-    style.innerHTML = `
-      * {
-        outline: none !important;
-        border: none !important;
-      }
-    `;
-    document.head.appendChild(style);
-
-    await new Promise(resolve => {
-      requestAnimationFrame(() => {
-        setTimeout(resolve, 500);
-      });
-    });
-
     try {
-      const bgColor = isDarkMode ? '#444444' : '#f7f7f7';
+      const elementToCapture = document.getElementById('preview-capture');
+      if (!elementToCapture) throw new Error('Preview element not found');
+      const style = document.createElement('style');
+      style.innerHTML = `* { outline: none !important; border: none !important; }`;
+      document.head.appendChild(style);
+      await new Promise(resolve => setTimeout(resolve, 100));
       const dataUrl = await domtoimage.toPng(elementToCapture, {
         quality: 1.0,
         cacheBust: true,
-        width: elementToCapture.scrollWidth,
-        height: elementToCapture.scrollHeight,
-        bgcolor: bgColor,
+        width: previewSize.width,
+        height: previewSize.height,
+        bgcolor: isDarkMode ? '#444444' : '#f7f7f7',
       });
-
-      if (!dataUrl || dataUrl === 'data:,') {
-        throw new Error("dom-to-image-more returned a blank image.");
-      }
-
       setCapturedImg(dataUrl);
-      if (!showModal) setShowModal(true);
-    } catch (error) {
-      console.error('Error capturing preview with dom-to-image:', error);
-      alert(`An error occurred while creating the preview. Please check the console for details.`);
-    } finally {
+      await new Promise(resolve => setTimeout(resolve, 150)); // เพิ่ม delay หลังสร้างไฟล์
+      if (navigator.share) {
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const file = new File([blob], 'my-gud-stack.png', { type: blob.type });
+        try {
+          await navigator.share({ files: [file], title: 'My GÚD Stack', text: 'Check out the GÚD friend I created!' });
+        } catch (err) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+          await navigator.share({ files: [file], title: 'My GÚD Stack', text: 'Check out the GÚD friend I created!' });
+        }
+      } else {
+        alert('Sharing is not supported on this browser.');
+      }
       document.head.removeChild(style);
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        console.error('Error sharing:', error);
+        alert(`An error occurred while sharing: ${error.message}`);
+      }
+    } finally {
+      setShowModalOverlay(false);
     }
   };
 
   useEffect(() => {
     if (showModal) {
-      handlePreview();
+      setShowNameWording(true);
     }
-    // eslint-disable-next-line
-  }, [userName]);
-
-  const handleShare = async () => {
-    if (!capturedImg) return;
-  
-    try {
-      // Convert data URL to blob
-      const response = await fetch(capturedImg);
-      const blob = await response.blob();
-  
-      // Create a file from the blob
-      const file = new File([blob], 'my-gud-stack.png', { type: blob.type });
-  
-      // Directly use the Web Share API if available
-      if (navigator.share) {
-        await navigator.share({
-          files: [file],
-          title: 'My GÚD Stack',
-          text: 'Check out the GÚD friend I created!',
-        });
-        console.log('Shared successfully');
-      } else {
-        // Fallback for browsers that don't support sharing files
-        alert('Sharing is not supported on this browser.');
-      }
-    } catch (error) {
-      // Handle cases where the user cancels the share sheet
-      if (error.name !== 'AbortError') {
-        console.error('Error sharing:', error);
-        alert(`An error occurred while sharing: ${error.message}`);
-      }
-    }
-  };
+  }, [userName, showModal]);
 
   return (
     <div style={{ background: "transparent" }}>
@@ -210,6 +197,22 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white border-opacity-80"></div>
         </div>
       )}
+
+      {/* Offscreen preview for capture (not scaled, real size) */}
+      {showModal && (
+        <div style={{ position: 'absolute', left: '-99999px', top: 0, width: previewSize.width, height: previewSize.height }}>
+          <div id="preview-capture">
+            <PreviewStackDisplay
+              stack={stack}
+              userName={userName}
+              isDarkMode={isDarkMode}
+              width={previewSize.width}
+              height={previewSize.height}
+            />
+          </div>
+        </div>
+      )}
+
       <PreviewModal
         show={showModal}
         image={capturedImg}
@@ -222,6 +225,44 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
         onShare={handleShare}
         userName={userName}
         setUserName={setUserName}
+        previewContent={
+          <div
+            style={{
+              width: '100%',
+              height: '70vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: '#f7f7f7',
+              borderRadius: 8,
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: previewSize.width,
+                height: previewSize.height,
+                transform: `scale(${Math.min(
+                  (window.innerWidth * 0.9) / previewSize.width,
+                  (window.innerHeight * 0.7) / previewSize.height,
+                  1
+                )})`,
+                transformOrigin: 'center center',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <PreviewStackDisplay
+                stack={stack}
+                userName={userName}
+                isDarkMode={isDarkMode}
+                width={previewSize.width}
+                height={previewSize.height}
+              />
+            </div>
+          </div>
+        }
       />
     </div>
   );

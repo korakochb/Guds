@@ -6,53 +6,47 @@ interface Props {
   show: boolean;
   image: string | null;
   onClose: () => void;
-  onShare: () => void;
+  onShare: () => Promise<void>;
   userName: string;
   setUserName: (name: string) => void;
+  previewContent?: React.ReactNode;
 }
 
-export default function PreviewModal({ show, image, onClose, onShare, userName, setUserName }: Props) {
-  if (!show || !image) return null;
-
-  // Check for Web Share API support
-  const canShare = typeof navigator.share === 'function';
-
+const PreviewModal: React.FC<Props> = ({ show, image, onClose, onShare, userName, setUserName, previewContent }) => {
+  if (!show) return null;
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
-      <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-6">
-        <div className="bg-white p-6 rounded shadow-lg text-center w-[90%] max-w-md">
-          <h3 className="text-xl font-avenir-demi font-semibold mb-4">YOUR GÚD</h3>
-          <input
-            type="text"
-            placeholder="Enter your name..."
-            value={userName}
-            onChange={e => setUserName(e.target.value)}
-            className="w-full mb-4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-lg text-center font-avenir-reg"
-            maxLength={10}
-          />
-          <div className="w-full flex items-center justify-center mx-auto mb-4 border bg-white">
-            <img
-              src={image}
-              alt="Stack Preview"
-              className="max-w-full h-auto object-contain"
-            />
-          </div>
-          <div className="w-full flex flex-col gap-3 mt-4">
-            {canShare && (
-              <button 
-                onClick={onShare} 
-                className="w-full text-black px-4 py-3 rounded-lg font-avenir-reg text-lg hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: '#d9d1c8' }}
-              >
-                Share
-              </button>
-            )}
-            <button onClick={onClose} className="w-full bg-gray-200 text-gray-700 px-4 py-2 rounded-lg mt-2 font-avenir-reg hover:bg-gray-300 transition-colors">
-              Close
-            </button>
-          </div>
+    // <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-2xl overflow-hidden">
+    //   <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-[95vw] sm:max-w-2xl w-auto max-h-screen overflow-y-auto flex flex-col items-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-2xl overflow-x-hidden">
+      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-[95vw] sm:max-w-2xl w-auto max-h-screen overflow-y-auto overflow-x-hidden flex flex-col items-center">
+        <h2 className="text-2xl font-avenir-demi mb-4 text-center">YOUR GÚD</h2>
+        <input
+          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded text-center text-lg font-avenir-reg"
+          placeholder="Enter your name..."
+          value={userName}
+          onChange={e => setUserName(e.target.value)}
+        />
+        {/* Preview Area */}
+        <div className="w-full flex justify-center items-center mb-6" style={{ background: '#f7f7f7', borderRadius: 8, maxWidth: '100%' }}>
+          {previewContent ? previewContent : image ? (
+            <img src={image} alt="Preview" className="max-w-full h-auto rounded" />
+          ) : null}
         </div>
+        <button
+          className="w-full bg-[#d9d1c8] text-black font-avenir-reg text-lg px-8 py-3 rounded-full hover:bg-gray-200 transition-colors mb-3"
+          onClick={onShare}
+        >
+          Share
+        </button>
+        <button
+          className="w-full bg-gray-100 text-gray-700 font-avenir-reg text-lg px-8 py-3 rounded-full hover:bg-gray-200 transition-colors"
+          onClick={onClose}
+        >
+          Close
+        </button>
       </div>
     </div>
   );
-}
+};
+
+export default PreviewModal;

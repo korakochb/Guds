@@ -8,22 +8,30 @@
 @font-face {
     font-family: 'Mont';
     src: url('/font/Mont-ExtraLightDEMO.otf') format('opentype');
-    font-weight: 300; /* ExtraLight is often 300 */
+    font-weight: 300;
+    /* ExtraLight is often 300 */
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Avenir Next Reg';
     src: url('/font/Avenir-next-regular.ttf') format('truetype');
-    font-weight: normal; /* 400 */
+    font-weight: normal;
+    /* 400 */
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Avenir Next Demi';
     src: url('/font/Avenir-next-demi-bold.ttf') format('truetype');
-    font-weight: 600; /* Demi Bold is often 600 */
+    font-weight: 600;
+    /* Demi Bold is often 600 */
     font-style: normal;
+}
+
+html,
+body {
+    overflow-x: hidden;
 }
 
 body {
