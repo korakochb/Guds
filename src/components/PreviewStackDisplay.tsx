@@ -19,8 +19,8 @@ const PreviewStackDisplay: React.FC<PreviewStackDisplayProps> = ({ stack, userNa
     // เลือกไฟล์พื้นหลังตามอัตราส่วนและโหมด
     const isPortrait = height > width;
     const bgImage = isDarkMode
-        ? (isPortrait ? '/decorations/previewBackgroundDark_mobile.png' : '/decorations/previewBackgroundDark_com.png')
-        : (isPortrait ? '/decorations/previewBackgroundLight_mobile.png' : '/decorations/previewBackgroundLight_com.png');
+        ? (isPortrait ? '/decorations/previewBackgroundDark_mobile.jpg' : '/decorations/previewBackgroundDark_com.jpg')
+        : (isPortrait ? '/decorations/previewBackgroundLight_mobile.jpg' : '/decorations/previewBackgroundLight_com.jpg');
     const stackBottom = isPortrait ? 600 : 230; // px
 
     return (

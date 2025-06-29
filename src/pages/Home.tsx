@@ -14,6 +14,21 @@ interface HomeProps {
   setIsDarkMode: (isDark: boolean) => void;
 }
 
+// ฟังก์ชัน preload images
+function preloadImages(urls) {
+  return Promise.all(
+    urls.map(
+      url =>
+        new Promise(resolve => {
+          const img = new window.Image();
+          img.onload = resolve;
+          img.onerror = resolve;
+          img.src = url;
+        })
+    )
+  );
+}
+
 export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
   const stackRef = useRef<HTMLDivElement | null>(null);
   const [stack, setStack] = useState([{ id: "base", uid: "base", img: "/decorations/base.png" }]);
@@ -23,6 +38,8 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
   const [showNameWording, setShowNameWording] = useState(false);
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [previewReady, setPreviewReady] = useState(false);
 
   // Responsive preview size (16:9 desktop, 9:16 mobile)
   const [previewSize, setPreviewSize] = useState({ width: 1920, height: 1080 });
@@ -53,6 +70,33 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
     };
   }, [showModal]);
 
+  useEffect(() => {
+    const assets = [
+      '/decorations/previewBackgroundDark_mobile.jpg',
+      '/decorations/previewBackgroundDark_com.jpg',
+      '/decorations/previewBackgroundLight_mobile.jpg',
+      '/decorations/previewBackgroundLight_com.jpg',
+      // preload รูปอื่นๆ ที่จำเป็น เช่น parts
+      ...parts.flatMap(part => [
+        `/characters/${part.id}/${part.id}_353432.png`,
+        `/characters/${part.id}/${part.id}_9fd6ff.png`,
+        `/characters/${part.id}/${part.id}_aa9e92.png`,
+        `/characters/${part.id}/${part.id}_fee98e.png`,
+        `/characters/${part.id}/${part.id}_ff953f.png`,
+      ])
+    ];
+    preloadImages(assets).then(() => setAssetsLoaded(true));
+  }, []);
+
+  useEffect(() => {
+    if (showModal) {
+      setPreviewReady(false);
+      setTimeout(() => setPreviewReady(true), 1000); // รอ 1 วินาทีหลัง modal เปิด
+    } else {
+      setPreviewReady(false);
+    }
+  }, [showModal]);
+
   const handleAddPart = (partId: string, imgSrc: string) => {
     if (stack.length >= MAX_STACK_ITEMS) return;
     const uid = `${partId}-${Date.now()}`;
@@ -66,8 +110,12 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
 
   // เปิด modal preview
   const handlePreview = () => {
-    setShowNameWording(true);
-    setShowModal(true);
+    if (assetsLoaded) {
+      setShowNameWording(true);
+      setShowModal(true);
+    } else {
+      alert('Loading assets, please wait...');
+    }
   };
 
   // Share: capture จาก div preview จริง
@@ -79,7 +127,7 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
       const style = document.createElement('style');
       style.innerHTML = `* { outline: none !important; border: none !important; }`;
       document.head.appendChild(style);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // รอ 2 วินาทีให้ทุกอย่างโหลดเสร็จ
+      await new Promise(resolve => setTimeout(resolve, 10)); // รอ 10 วินาทีให้ทุกอย่างโหลดเสร็จ
       const dataUrl = await domtoimage.toJpeg(elementToCapture, {
         quality: 1.0,
         width: previewSize.width,
@@ -87,16 +135,20 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
         bgcolor: isDarkMode ? '#444444' : '#f7f7f7',
       });
       setCapturedImg(dataUrl);
-      await new Promise(resolve => setTimeout(resolve, 150)); // เพิ่ม delay หลังสร้างไฟล์
+      await new Promise(resolve => setTimeout(resolve, 1000));
       if (navigator.share) {
         const response = await fetch(dataUrl);
         const blob = await response.blob();
-        const file = new File([blob], 'my-gud-stack.png', { type: blob.type });
+        const file = new File([blob], 'my-gud-stack.jpg', { type: blob.type });
         try {
           await navigator.share({ files: [file], title: 'My GÚD Stack', text: 'Check out the GÚD friend I created!' });
         } catch (err) {
           await new Promise(resolve => setTimeout(resolve, 500));
-          await navigator.share({ files: [file], title: 'My GÚD Stack', text: 'Check out the GÚD friend I created!' });
+          try {
+            await navigator.share({ files: [file], title: 'My GÚD Stack', text: 'Check out the GÚD friend I created!' });
+          } catch (err2) {
+            alert('An error occurred while sharing. Please try again.');
+          }
         }
       } else {
         alert('Sharing is not supported on this browser.');
@@ -104,11 +156,14 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
       document.head.removeChild(style);
     } catch (error) {
       if (error.name !== 'AbortError') {
-        console.error('Error sharing:', error);
         alert(`An error occurred while sharing: ${error.message}`);
       }
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
     } finally {
       setShowModalOverlay(false);
+      document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = 'auto';
     }
   };
 
@@ -262,6 +317,7 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
             </div>
           </div>
         }
+        shareDisabled={!assetsLoaded || !previewReady}
       />
     </div>
   );

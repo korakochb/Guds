@@ -10,15 +10,16 @@ interface Props {
   userName: string;
   setUserName: (name: string) => void;
   previewContent?: React.ReactNode;
+  shareDisabled?: boolean;
 }
 
-const PreviewModal: React.FC<Props> = ({ show, image, onClose, onShare, userName, setUserName, previewContent }) => {
+const PreviewModal: React.FC<Props> = ({ show, image, onClose, onShare, userName, setUserName, previewContent, shareDisabled }) => {
   if (!show) return null;
   return (
     // <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-2xl overflow-hidden">
     //   <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-[95vw] sm:max-w-2xl w-auto max-h-screen overflow-y-auto flex flex-col items-center">
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-2xl overflow-x-hidden">
-      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-[95vw] sm:max-w-2xl w-auto max-h-screen overflow-y-auto overflow-x-hidden flex flex-col items-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-2xl overflow-x-hidden h-[100dvh]">
+      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 max-w-[95vw] sm:max-w-2xl w-auto h-[100dvh] max-h-[100dvh] overflow-y-auto overflow-x-hidden flex flex-col items-center">
         <h2 className="text-2xl font-avenir-demi mb-4 text-center">YOUR GÚD</h2>
         <input
           className="w-full mb-4 px-4 py-2 border border-gray-300 rounded text-center text-lg font-avenir-reg"
@@ -35,6 +36,7 @@ const PreviewModal: React.FC<Props> = ({ show, image, onClose, onShare, userName
         <button
           className="w-full bg-[#d9d1c8] text-black font-avenir-reg text-lg px-8 py-3 rounded-full hover:bg-gray-200 transition-colors mb-3"
           onClick={onShare}
+          disabled={shareDisabled}
         >
           Share
         </button>
