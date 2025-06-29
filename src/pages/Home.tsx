@@ -342,7 +342,7 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
               onClick={handleConfirmCanvas}
               disabled={!assetsLoaded || !previewReady}
             >
-              Confirm (Canvas)
+              Confirm
             </button>
           </>
         )}
