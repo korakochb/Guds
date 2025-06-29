@@ -64,7 +64,6 @@ const StackDisplay = forwardRef<HTMLDivElement, Props>(
           <button
             onClick={() => {
               setIsDarkMode(false);
-              handleCloseHint();
             }}
             className={`w-12 flex items-center justify-center font-avenir-reg text-lg text-white ${!isDarkMode ? 'h-8 bg-[#333]' : 'h-14 bg-[#666]'} rounded-t transition-all duration-300`}
             style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}

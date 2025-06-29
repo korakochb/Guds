@@ -134,27 +134,28 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
   // กด Confirm เพื่อ generate รูป
   const handleConfirm = async () => {
     setShowModalOverlay(true);
-    // รอ 2 วินาทีให้มือถือโหลด asset/render ครบ
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    try {
-      const elementToCapture = document.getElementById('preview-capture');
-      if (!elementToCapture) throw new Error('Preview element not found');
-      const style = document.createElement('style');
-      style.innerHTML = `* { outline: none !important; border: none !important; }`;
-      document.head.appendChild(style);
-      const dataUrl = await domtoimage.toJpeg(elementToCapture, {
-        quality: 1.0,
-        width: previewSize.width,
-        height: previewSize.height,
-        bgcolor: isDarkMode ? '#444444' : '#f7f7f7',
-      });
-      setGeneratedImg(dataUrl);
-      document.head.removeChild(style);
-    } catch (error) {
-      alert(`An error occurred while generating image: ${error.message}`);
-    } finally {
-      setShowModalOverlay(false);
+    let lastDataUrl = null;
+    for (let i = 0; i < 5; i++) {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // รอ 1 วิแต่ละรอบ
+      try {
+        const elementToCapture = document.getElementById('preview-capture');
+        if (!elementToCapture) throw new Error('Preview element not found');
+        const style = document.createElement('style');
+        style.innerHTML = `* { outline: none !important; border: none !important; }`;
+        document.head.appendChild(style);
+        lastDataUrl = await domtoimage.toJpeg(elementToCapture, {
+          quality: 1.0,
+          width: previewSize.width,
+          height: previewSize.height,
+          bgcolor: isDarkMode ? '#444444' : '#f7f7f7',
+        });
+        document.head.removeChild(style);
+      } catch (error) {
+        console.error("Error generating image (round", i + 1, "):", error);
+      }
     }
+    setGeneratedImg(lastDataUrl);
+    setShowModalOverlay(false);
   };
 
   // กด Share เพื่อ share รูปที่ generate ไว้แล้ว
@@ -171,7 +172,7 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
         alert('Sharing is not supported on this browser.');
       }
     } catch (error) {
-      alert(`An error occurred while sharing: ${error.message}`);
+      console.error("An error occurred while sharing:", error);
     } finally {
       setShowModalOverlay(false);
     }
@@ -237,7 +238,7 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
       {/* --- Section 2: Main Interaction --- */}
       <section className="min-h-screen flex flex-col justify-center items-center p-8">
         <h2 className={`text-4xl font-avenir-demi font-semibold mb-8 tracking-wide text-center ${isDarkMode ? 'text-white' : 'text-black'}`}
-          style={{marginBottom: '2rem'}}>
+          style={{ marginBottom: '2rem' }}>
           Choose your own gud friends
         </h2>
         <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch min-h-0">
@@ -278,16 +279,16 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
         <div className="w-full max-w-screen-lg mx-auto flex-1 flex flex-col text-center px-4">
           <div className="flex-grow flex flex-col justify-center">
             <h3 className={`text-2xl font-avenir-demi tracking-widest ${isDarkMode ? 'text-gray-300' : 'text-gray-800'} mb-24`}>
-                NOTE FROM YOUR GUDS FRIENDS
+              NOTE FROM YOUR GUDS FRIENDS
             </h3>
             <p className={`text-3xl font-avenir-reg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} leading-relaxed max-w-3xl mx-auto`}>
-                If you think about stuff that happened when you were young, it stays with you forever
+              If you think about stuff that happened when you were young, it stays with you forever
             </p>
           </div>
 
           <div className="flex-shrink-0">
             <p className={`text-xs font-avenir-reg ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} tracking-wider mb-4`}>
-                instagram: gudsstudio | gudscompany@gmail.com | GUDS Bangkok +66 83133 3839
+              instagram: gudsstudio | gudscompany@gmail.com | GUDS Bangkok +66 83133 3839
             </p>
             <InfinitePartStrip parts={parts} />
           </div>
@@ -373,14 +374,6 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
             disabled={!assetsLoaded || !previewReady}
           >
             Confirm
-          </button>
-        )}
-        saveButton={generatedImg && (
-          <button
-            className="w-full bg-green-500 text-white font-avenir-reg text-lg px-8 py-3 rounded-full hover:bg-green-600 transition-colors mb-3"
-            onClick={handleSaveImage}
-          >
-            Save Image
           </button>
         )}
         backButton={generatedImg && (

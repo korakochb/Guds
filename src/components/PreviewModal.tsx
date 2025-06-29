@@ -72,10 +72,10 @@ const PreviewModal: React.FC<Props> = ({ show, image, onClose, onShare, userName
           Close
         </button>
         {showOverlay && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-red-500/80 backdrop-blur-2xl">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#a4cde5]/90 backdrop-blur-2xl">
             <div className="flex flex-col items-center">
               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white border-opacity-80 mb-4"></div>
-              <span className="text-white text-2xl font-bold">LOADING</span>
+              <span className="text-[#aa9e91] text-2xl font-bold">LOADING</span>
             </div>
           </div>
         )}
