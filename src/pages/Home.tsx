@@ -79,10 +79,9 @@ export default function Home({ isDarkMode, setIsDarkMode }: HomeProps) {
       const style = document.createElement('style');
       style.innerHTML = `* { outline: none !important; border: none !important; }`;
       document.head.appendChild(style);
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const dataUrl = await domtoimage.toPng(elementToCapture, {
+      await new Promise(resolve => setTimeout(resolve, 2000)); // รอ 2 วินาทีให้ทุกอย่างโหลดเสร็จ
+      const dataUrl = await domtoimage.toJpeg(elementToCapture, {
         quality: 1.0,
-        cacheBust: true,
         width: previewSize.width,
         height: previewSize.height,
         bgcolor: isDarkMode ? '#444444' : '#f7f7f7',
